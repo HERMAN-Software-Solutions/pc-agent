@@ -1,37 +1,31 @@
-"""PC Agent — Phase 2 test harness.
+"""PC Agent — interactive CLI.
 
-Proves the LLM wrapper and file tools work before we wire them together.
+Phase 3: the agent loop is live. Ask it things and watch it use tools.
 """
 
-from agent.llm import ask
-from agent.tools.files import list_files, read_file
+from agent.loop import run_agent
 
 
 def main():
     print("=" * 50)
-    print("Phase 2 test harness")
+    print("PC Agent (Phase 3) — type 'quit' to exit")
     print("=" * 50)
 
-    # --- Test 1: LLM wrapper ---
-    print("\n[1] Testing LLM wrapper...")
-    reply = ask("Reply with exactly: LLM OK")
-    print(f"    Model said: {reply.strip()}")
+    while True:
+        try:
+            goal = input("\nYou: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nBye.")
+            break
 
-    # --- Test 2: list_files ---
-    print("\n[2] Testing list_files('.'):")
-    print(list_files("."))
+        if not goal:
+            continue
+        if goal.lower() in {"quit", "exit", "q"}:
+            print("Bye.")
+            break
 
-    # --- Test 3: list_files on Downloads ---
-    print("\n[3] Testing list_files('Downloads'):")
-    print(list_files("Downloads"))
-
-    # --- Test 4: sandbox escape attempt ---
-    print("\n[4] Testing sandbox escape (should FAIL safely):")
-    print(read_file(r"C:\Windows\System32\drivers\etc\hosts"))
-
-    print("\n" + "=" * 50)
-    print("Phase 2 test complete.")
-    print("=" * 50)
+        answer = run_agent(goal, verbose=True)
+        print(f"\nAgent: {answer}")
 
 
 if __name__ == "__main__":
